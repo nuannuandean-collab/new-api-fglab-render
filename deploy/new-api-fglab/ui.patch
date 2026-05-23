@@ -1,3 +1,92 @@
+diff --git a/main.go b/main.go
+index 3361b8c..e709f00 100644
+--- a/main.go
++++ b/main.go
+@@ -173,6 +173,7 @@ func main() {
+ 	//server.Use(gzip.Gzip(gzip.DefaultCompression))
+ 	server.Use(middleware.RequestId())
+ 	server.Use(middleware.PoweredBy())
++	server.Use(middleware.SecurityHeaders())
+ 	server.Use(middleware.I18n())
+ 	middleware.SetUpLogger(server)
+ 	// Initialize session store
+@@ -181,7 +182,7 @@ func main() {
+ 		Path:     "/",
+ 		MaxAge:   2592000, // 30 days
+ 		HttpOnly: true,
+-		Secure:   false,
++		Secure:   common.GetEnvOrDefaultBool("SESSION_COOKIE_SECURE", true),
+ 		SameSite: http.SameSiteStrictMode,
+ 	})
+ 	server.Use(sessions.Sessions("session", store))
+diff --git a/middleware/cors.go b/middleware/cors.go
+index 6aaa15d..bfa2040 100644
+--- a/middleware/cors.go
++++ b/middleware/cors.go
+@@ -1,20 +1,61 @@
+ package middleware
+ 
+ import (
++	"os"
++	"strings"
++
+ 	"github.com/QuantumNous/new-api/common"
++	"github.com/QuantumNous/new-api/setting/system_setting"
+ 	"github.com/gin-contrib/cors"
+ 	"github.com/gin-gonic/gin"
+ )
+ 
+ func CORS() gin.HandlerFunc {
+ 	config := cors.DefaultConfig()
+-	config.AllowAllOrigins = true
++	origins := configuredCorsOrigins()
++	if len(origins) > 0 {
++		config.AllowOrigins = origins
++	} else {
++		config.AllowOriginFunc = func(origin string) bool {
++			return false
++		}
++	}
+ 	config.AllowCredentials = true
+ 	config.AllowMethods = []string{"GET", "POST", "PUT", "DELETE", "OPTIONS"}
+-	config.AllowHeaders = []string{"*"}
++	config.AllowHeaders = []string{
++		"Origin",
++		"Content-Type",
++		"Accept",
++		"Authorization",
++		"New-API-User",
++		"Cache-Control",
++		"X-Requested-With",
++	}
+ 	return cors.New(config)
+ }
+ 
++func configuredCorsOrigins() []string {
++	raw := os.Getenv("CORS_ALLOWED_ORIGINS")
++	if raw == "" {
++		raw = system_setting.ServerAddress
++	}
++
++	seen := make(map[string]struct{})
++	origins := make([]string, 0)
++	for _, origin := range strings.Split(raw, ",") {
++		origin = strings.TrimRight(strings.TrimSpace(origin), "/")
++		if origin == "" {
++			continue
++		}
++		if _, ok := seen[origin]; ok {
++			continue
++		}
++		seen[origin] = struct{}{}
++		origins = append(origins, origin)
++	}
++	return origins
++}
++
+ func PoweredBy() gin.HandlerFunc {
+ 	return func(c *gin.Context) {
+ 		c.Header("X-New-Api-Version", common.Version)
 diff --git a/web/classic/src/components/layout/headerbar/HeaderLogo.jsx b/web/classic/src/components/layout/headerbar/HeaderLogo.jsx
 index 73be051..6654030 100644
 --- a/web/classic/src/components/layout/headerbar/HeaderLogo.jsx
@@ -492,3 +581,38 @@ index c242e08..faf7672 100644
                      <div className='w-8 h-8 sm:w-10 sm:h-10 md:w-12 md:h-12 flex items-center justify-center'>
                        <Moonshot size={40} />
                      </div>
+diff --git a/middleware/security_headers.go b/middleware/security_headers.go
+new file mode 100644
+index 0000000..89c7ec1
+--- /dev/null
++++ b/middleware/security_headers.go
+@@ -0,0 +1,29 @@
++package middleware
++
++import (
++	"strings"
++
++	"github.com/gin-gonic/gin"
++)
++
++func SecurityHeaders() gin.HandlerFunc {
++	return func(c *gin.Context) {
++		c.Header("Strict-Transport-Security", "max-age=31536000; includeSubDomains")
++		c.Header("X-Content-Type-Options", "nosniff")
++		c.Header("X-Frame-Options", "SAMEORIGIN")
++		c.Header("Referrer-Policy", "strict-origin-when-cross-origin")
++		c.Header("Permissions-Policy", "camera=(), microphone=(), geolocation=()")
++		c.Header("Content-Security-Policy", strings.Join([]string{
++			"default-src 'self'",
++			"script-src 'self' 'unsafe-inline'",
++			"style-src 'self' 'unsafe-inline'",
++			"img-src 'self' data: blob: https:",
++			"font-src 'self' data:",
++			"connect-src 'self' https: wss:",
++			"frame-ancestors 'self'",
++			"base-uri 'self'",
++			"form-action 'self'",
++		}, "; "))
++		c.Next()
++	}
++}
