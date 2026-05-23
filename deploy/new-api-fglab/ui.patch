@@ -1,0 +1,494 @@
+diff --git a/web/classic/src/components/layout/headerbar/HeaderLogo.jsx b/web/classic/src/components/layout/headerbar/HeaderLogo.jsx
+index 73be051..6654030 100644
+--- a/web/classic/src/components/layout/headerbar/HeaderLogo.jsx
++++ b/web/classic/src/components/layout/headerbar/HeaderLogo.jsx
+@@ -19,60 +19,26 @@ For commercial licensing, please contact support@quantumnous.com
+ 
+ import React from 'react';
+ import { Link } from 'react-router-dom';
+-import { Typography, Tag } from '@douyinfe/semi-ui';
+-import SkeletonWrapper from '../components/SkeletonWrapper';
+-
+-const HeaderLogo = ({
+-  isMobile,
+-  isConsoleRoute,
+-  logo,
+-  logoLoaded,
+-  isLoading,
+-  systemName,
+-  isSelfUseMode,
+-  isDemoSiteMode,
+-  t,
+-}) => {
+-  if (isMobile && isConsoleRoute) {
+-    return null;
+-  }
+ 
++const HeaderLogo = () => {
+   return (
+-    <Link to='/' className='group flex items-center gap-2'>
+-      <div className='relative w-8 h-8 md:w-8 md:h-8'>
+-        <SkeletonWrapper loading={isLoading || !logoLoaded} type='image' />
+-        <img
+-          src={logo}
+-          alt='logo'
+-          className={`absolute inset-0 w-full h-full transition-all duration-200 group-hover:scale-110 rounded-full ${!isLoading && logoLoaded ? 'opacity-100' : 'opacity-0'}`}
+-        />
+-      </div>
+-      <div className='hidden md:flex items-center gap-2'>
+-        <div className='flex items-center gap-2'>
+-          <SkeletonWrapper
+-            loading={isLoading}
+-            type='title'
+-            width={120}
+-            height={24}
+-          >
+-            <Typography.Title
+-              heading={4}
+-              className='!text-lg !font-semibold !mb-0'
+-            >
+-              {systemName}
+-            </Typography.Title>
+-          </SkeletonWrapper>
+-          {(isSelfUseMode || isDemoSiteMode) && !isLoading && (
+-            <Tag
+-              color={isSelfUseMode ? 'purple' : 'blue'}
+-              className='text-xs px-1.5 py-0.5 rounded whitespace-nowrap shadow-sm'
+-              size='small'
+-              shape='circle'
+-            >
+-              {isSelfUseMode ? t('自用模式') : t('演示站点')}
+-            </Tag>
+-          )}
+-        </div>
++    <Link
++      to='/'
++      className='group flex items-center gap-3 min-w-0'
++      aria-label='FG LAB Future Gadget Laboratory'
++    >
++      <img
++        src='/fglab/fglab-mark.svg'
++        alt='FG LAB'
++        className='h-10 w-10 shrink-0 transition-transform duration-200 group-hover:scale-105'
++      />
++      <div className='hidden md:flex flex-col leading-none min-w-0'>
++        <span className='text-[15px] font-black tracking-[0.12em] text-[#151517] dark:text-[#f6f1e8]'>
++          FG LAB
++        </span>
++        <span className='mt-1 text-[12px] font-medium text-[#6a6761] dark:text-[#c8c0b5] whitespace-nowrap'>
++          Future Gadget Laboratory
++        </span>
+       </div>
+     </Link>
+   );
+diff --git a/web/classic/src/helpers/utils.jsx b/web/classic/src/helpers/utils.jsx
+index 7c7e63c..ba03012 100644
+--- a/web/classic/src/helpers/utils.jsx
++++ b/web/classic/src/helpers/utils.jsx
+@@ -47,15 +47,11 @@ export function isRoot() {
+ }
+ 
+ export function getSystemName() {
+-  let system_name = localStorage.getItem('system_name');
+-  if (!system_name) return 'New API';
+-  return system_name;
++  return 'FG LAB';
+ }
+ 
+ export function getLogo() {
+-  let logo = localStorage.getItem('logo');
+-  if (!logo) return '/logo.png';
+-  return logo;
++  return '/fglab/fglab-mark.svg';
+ }
+ 
+ export function getUserIdFromLocalStorage() {
+diff --git a/web/classic/src/index.css b/web/classic/src/index.css
+index 57b8c4b..f238543 100644
+--- a/web/classic/src/index.css
++++ b/web/classic/src/index.css
+@@ -18,6 +18,55 @@
+   --sidebar-width: 180px;
+   --sidebar-width-collapsed: 60px;
+   --sidebar-current-width: var(--sidebar-width);
++  --fg-lab-bg: #f5f1e8;
++  --fg-lab-surface: #fbf9f4;
++  --fg-lab-surface-soft: #eee8dc;
++  --fg-lab-ink: #151517;
++  --fg-lab-muted: #6a6761;
++  --fg-lab-border: #d8d2c8;
++  --fg-lab-blush: #f1ddda;
++  --semi-color-primary: #151517;
++  --semi-color-primary-hover: #2a2928;
++  --semi-color-primary-active: #000;
++  --semi-color-primary-light-default: rgba(21, 21, 23, 0.06);
++  --semi-color-primary-light-hover: rgba(21, 21, 23, 0.1);
++  --semi-color-primary-light-active: rgba(21, 21, 23, 0.14);
++  --semi-color-bg-0: var(--fg-lab-bg);
++  --semi-color-bg-1: var(--fg-lab-surface);
++  --semi-color-bg-2: #fffdf8;
++  --semi-color-border: var(--fg-lab-border);
++  --semi-color-fill-0: rgba(21, 21, 23, 0.04);
++  --semi-color-fill-1: rgba(21, 21, 23, 0.07);
++  --semi-color-fill-2: rgba(21, 21, 23, 0.11);
++  --semi-color-text-0: var(--fg-lab-ink);
++  --semi-color-text-1: var(--fg-lab-muted);
++  --semi-color-text-2: #969188;
++}
++
++html.dark {
++  --fg-lab-bg: #151517;
++  --fg-lab-surface: #1d1d1f;
++  --fg-lab-surface-soft: #2a2928;
++  --fg-lab-ink: #f6f1e8;
++  --fg-lab-muted: #c8c0b5;
++  --fg-lab-border: rgba(246, 241, 232, 0.14);
++  --fg-lab-blush: rgba(88, 61, 61, 0.35);
++  --semi-color-primary: #f6f1e8;
++  --semi-color-primary-hover: #fffaf1;
++  --semi-color-primary-active: #fff;
++  --semi-color-primary-light-default: rgba(246, 241, 232, 0.08);
++  --semi-color-primary-light-hover: rgba(246, 241, 232, 0.13);
++  --semi-color-primary-light-active: rgba(246, 241, 232, 0.18);
++  --semi-color-bg-0: var(--fg-lab-bg);
++  --semi-color-bg-1: var(--fg-lab-surface);
++  --semi-color-bg-2: #242426;
++  --semi-color-border: var(--fg-lab-border);
++  --semi-color-fill-0: rgba(246, 241, 232, 0.05);
++  --semi-color-fill-1: rgba(246, 241, 232, 0.08);
++  --semi-color-fill-2: rgba(246, 241, 232, 0.12);
++  --semi-color-text-0: var(--fg-lab-ink);
++  --semi-color-text-1: var(--fg-lab-muted);
++  --semi-color-text-2: #918a80;
+ }
+ 
+ body.sidebar-collapsed {
+@@ -25,12 +74,39 @@ body.sidebar-collapsed {
+ }
+ 
+ body {
++  --semi-color-primary: var(--fg-lab-ink);
++  --semi-color-primary-hover: color-mix(in srgb, var(--fg-lab-ink) 92%, white);
++  --semi-color-primary-active: var(--fg-lab-ink);
++  --semi-color-primary-light-default: rgba(21, 21, 23, 0.06);
++  --semi-color-primary-light-hover: rgba(21, 21, 23, 0.1);
++  --semi-color-primary-light-active: rgba(21, 21, 23, 0.14);
++  --semi-color-bg-0: var(--fg-lab-bg);
++  --semi-color-bg-1: var(--fg-lab-surface);
++  --semi-color-bg-2: #fffdf8;
++  --semi-color-border: var(--fg-lab-border);
++  --semi-color-fill-0: rgba(21, 21, 23, 0.04);
++  --semi-color-fill-1: rgba(21, 21, 23, 0.07);
++  --semi-color-fill-2: rgba(21, 21, 23, 0.11);
++  --semi-color-text-0: var(--fg-lab-ink);
++  --semi-color-text-1: var(--fg-lab-muted);
++  --semi-color-text-2: #969188;
+   font-family: Lato, 'Helvetica Neue', Arial, Helvetica, 'Microsoft YaHei',
+     sans-serif;
+   color: var(--semi-color-text-0);
+   background-color: var(--semi-color-bg-0);
+ }
+ 
++html.dark body {
++  --semi-color-primary-light-default: rgba(246, 241, 232, 0.08);
++  --semi-color-primary-light-hover: rgba(246, 241, 232, 0.13);
++  --semi-color-primary-light-active: rgba(246, 241, 232, 0.18);
++  --semi-color-bg-2: #242426;
++  --semi-color-fill-0: rgba(246, 241, 232, 0.05);
++  --semi-color-fill-1: rgba(246, 241, 232, 0.08);
++  --semi-color-fill-2: rgba(246, 241, 232, 0.12);
++  --semi-color-text-2: #918a80;
++}
++
+ /* 桌面端禁止 body 纵向滚动 - 防止 VChart tooltip 触发页面滚动条 */
+ @media (min-width: 768px) {
+   body {
+@@ -721,6 +797,151 @@ html.dark .sbg-variant-green {
+   -webkit-text-fill-color: transparent;
+ }
+ 
++/* ==================== FG Lab homepage polish ==================== */
++.fglab-home {
++  background:
++    linear-gradient(rgba(216, 210, 200, 0.32) 1px, transparent 1px),
++    linear-gradient(90deg, rgba(216, 210, 200, 0.32) 1px, transparent 1px),
++    var(--fg-lab-bg);
++  background-size: 90px 90px, 90px 90px, auto;
++}
++
++.fglab-hero {
++  background: transparent;
++}
++
++.fglab-grid-bg,
++.fglab-soft-glow {
++  position: absolute;
++  inset: 0;
++  pointer-events: none;
++}
++
++.fglab-grid-bg {
++  z-index: -2;
++  background:
++    linear-gradient(rgba(216, 210, 200, 0.28) 1px, transparent 1px),
++    linear-gradient(90deg, rgba(216, 210, 200, 0.28) 1px, transparent 1px);
++  background-size: 90px 90px;
++  mask-image: linear-gradient(to bottom, black 0%, black 72%, transparent 100%);
++}
++
++.fglab-soft-glow {
++  z-index: -1;
++  background:
++    radial-gradient(circle at 50% 12%, rgba(241, 221, 218, 0.62), transparent 32%),
++    radial-gradient(circle at 36% 40%, rgba(232, 224, 211, 0.72), transparent 28%);
++}
++
++.fglab-hero-title {
++  letter-spacing: 0;
++  text-wrap: balance;
++  text-shadow: 0 1px 0 rgba(255, 255, 255, 0.36);
++}
++
++.fglab-base-url .semi-input-wrapper {
++  border: 1px solid rgba(21, 21, 23, 0.08);
++  background: rgba(251, 249, 244, 0.82);
++  box-shadow: 0 18px 50px -34px rgba(21, 21, 23, 0.55);
++  backdrop-filter: blur(18px);
++}
++
++.fglab-primary-action.semi-button,
++.fglab-icon-action.semi-button {
++  background: var(--fg-lab-ink) !important;
++  border-color: var(--fg-lab-ink) !important;
++  color: var(--fg-lab-bg) !important;
++  box-shadow: 0 16px 28px -18px rgba(21, 21, 23, 0.65);
++}
++
++.fglab-primary-action.semi-button:hover,
++.fglab-icon-action.semi-button:hover {
++  filter: brightness(1.08);
++}
++
++.fglab-secondary-action.semi-button {
++  border-color: rgba(21, 21, 23, 0.1) !important;
++  background: rgba(251, 249, 244, 0.72) !important;
++  color: var(--fg-lab-ink) !important;
++}
++
++.fglab-provider-title {
++  color: rgba(21, 21, 23, 0.62) !important;
++  letter-spacing: 0.02em;
++}
++
++.fglab-inventor-avatars {
++  display: inline-flex;
++  align-items: center;
++  justify-content: center;
++  gap: 14px;
++  min-width: 180px;
++  min-height: 56px;
++  margin-bottom: 18px;
++  padding: 8px 18px;
++  border-radius: 9999px;
++  background: rgba(251, 249, 244, 0.54);
++  border: 1px solid rgba(21, 21, 23, 0.08);
++  box-shadow: 0 18px 48px -34px rgba(21, 21, 23, 0.48);
++  backdrop-filter: blur(16px);
++}
++
++.fglab-inventor-avatar {
++  display: flex;
++  align-items: center;
++  justify-content: center;
++  width: 40px;
++  height: 40px;
++  border-radius: 9999px;
++  background: rgba(251, 249, 244, 0.88);
++  border: 1px solid rgba(21, 21, 23, 0.08);
++  box-shadow: 0 16px 36px -26px rgba(21, 21, 23, 0.5);
++  overflow: hidden;
++}
++
++.fglab-inventor-avatar img {
++  width: 100%;
++  height: 100%;
++  object-fit: cover;
++}
++
++html.dark .fglab-home {
++  background:
++    linear-gradient(rgba(246, 241, 232, 0.08) 1px, transparent 1px),
++    linear-gradient(90deg, rgba(246, 241, 232, 0.08) 1px, transparent 1px),
++    var(--fg-lab-bg);
++}
++
++html.dark .fglab-grid-bg {
++  background:
++    linear-gradient(rgba(246, 241, 232, 0.08) 1px, transparent 1px),
++    linear-gradient(90deg, rgba(246, 241, 232, 0.08) 1px, transparent 1px);
++}
++
++html.dark .fglab-soft-glow {
++  background:
++    radial-gradient(circle at 50% 12%, rgba(91, 64, 64, 0.45), transparent 34%),
++    radial-gradient(circle at 36% 40%, rgba(246, 241, 232, 0.08), transparent 28%);
++}
++
++html.dark .fglab-base-url .semi-input-wrapper,
++html.dark .fglab-secondary-action.semi-button,
++html.dark .fglab-inventor-avatars,
++html.dark .fglab-inventor-avatar {
++  border-color: rgba(246, 241, 232, 0.12) !important;
++  background: rgba(29, 29, 31, 0.76) !important;
++  color: var(--fg-lab-ink) !important;
++}
++
++html.dark .fglab-primary-action.semi-button,
++html.dark .fglab-icon-action.semi-button {
++  color: #151517 !important;
++}
++
++html.dark .fglab-provider-title {
++  color: rgba(246, 241, 232, 0.62) !important;
++}
++
+ /* ==================== ScrollList 定制样式 ==================== */
+ .semi-scrolllist,
+ .semi-scrolllist * {
+diff --git a/web/classic/src/pages/Home/index.jsx b/web/classic/src/pages/Home/index.jsx
+index c242e08..faf7672 100644
+--- a/web/classic/src/pages/Home/index.jsx
++++ b/web/classic/src/pages/Home/index.jsx
+@@ -65,6 +65,17 @@ import {
+ 
+ const { Text } = Typography;
+ 
++const labAvatars = [
++  {
++    src: '/fglab/wei-da-avatar.png',
++    alt: 'Wei Da',
++  },
++  {
++    src: '/fglab/makise-kurisu-avatar.png',
++    alt: 'Makise Kurisu',
++  },
++];
++
+ const Home = () => {
+   const { t, i18n } = useTranslation();
+   const [statusState] = useContext(StatusContext);
+@@ -149,7 +160,7 @@ const Home = () => {
+   }, [endpointItems.length]);
+ 
+   return (
+-    <div className='w-full overflow-x-hidden'>
++    <div className='fglab-home w-full overflow-x-hidden'>
+       <NoticeModal
+         visible={noticeVisible}
+         onClose={() => setNoticeVisible(false)}
+@@ -158,21 +169,21 @@ const Home = () => {
+       {homePageContentLoaded && homePageContent === '' ? (
+         <div className='w-full overflow-x-hidden'>
+           {/* Banner 部分 */}
+-          <div className='w-full border-b border-semi-color-border min-h-[500px] md:min-h-[600px] lg:min-h-[700px] relative overflow-x-hidden'>
+-            {/* 背景模糊晕染球 */}
+-            <div className='blur-ball blur-ball-indigo' />
+-            <div className='blur-ball blur-ball-teal' />
++          <div className='fglab-hero w-full border-b border-semi-color-border min-h-[500px] md:min-h-[600px] lg:min-h-[700px] relative overflow-x-hidden'>
++            <div className='fglab-grid-bg' />
++            <div className='fglab-soft-glow' />
+             <div className='flex items-center justify-center h-full px-4 py-20 md:py-24 lg:py-32 mt-10'>
+               {/* 居中内容区 */}
+               <div className='flex flex-col items-center justify-center text-center max-w-4xl mx-auto'>
+                 <div className='flex flex-col items-center justify-center mb-6 md:mb-8'>
+                   <h1
+-                    className={`text-4xl md:text-5xl lg:text-6xl xl:text-7xl font-bold text-semi-color-text-0 leading-tight ${isChinese ? 'tracking-wide md:tracking-wider' : ''}`}
++                    className={`fglab-hero-title text-4xl md:text-5xl lg:text-6xl xl:text-7xl font-black text-semi-color-text-0 leading-tight ${isChinese ? 'tracking-wide md:tracking-wider' : ''}`}
++                    aria-label='为爱存在的大模型接口网关'
+                   >
+                     <>
+-                      {t('统一的')}
++                      为爱存在的
+                       <br />
+-                      <span className='shine-text'>{t('大模型接口网关')}</span>
++                      <span>大模型接口网关</span>
+                     </>
+                   </h1>
+                   <p className='text-base md:text-lg lg:text-xl text-semi-color-text-1 mt-4 md:mt-6 max-w-xl'>
+@@ -183,7 +194,7 @@ const Home = () => {
+                     <Input
+                       readonly
+                       value={serverAddress}
+-                      className='flex-1 !rounded-full'
++                      className='fglab-base-url flex-1 !rounded-full'
+                       size={isMobile ? 'default' : 'large'}
+                       suffix={
+                         <div className='flex items-center gap-2'>
+@@ -203,7 +214,7 @@ const Home = () => {
+                             type='primary'
+                             onClick={handleCopyBaseURL}
+                             icon={<IconCopy />}
+-                            className='!rounded-full'
++                            className='fglab-icon-action !rounded-full'
+                           />
+                         </div>
+                       }
+@@ -218,17 +229,17 @@ const Home = () => {
+                       theme='solid'
+                       type='primary'
+                       size={isMobile ? 'default' : 'large'}
+-                      className='!rounded-3xl px-8 py-2'
++                      className='fglab-primary-action !rounded-3xl px-8 py-2'
+                       icon={<IconPlay />}
+                     >
+                       {t('获取密钥')}
+                     </Button>
+                   </Link>
+                   {isDemoSiteMode && statusState?.status?.version ? (
+-                    <Button
+-                      size={isMobile ? 'default' : 'large'}
+-                      className='flex items-center !rounded-3xl px-6 py-2'
+-                      icon={<IconGithubLogo />}
++                      <Button
++                        size={isMobile ? 'default' : 'large'}
++                        className='fglab-secondary-action flex items-center !rounded-3xl px-6 py-2'
++                        icon={<IconGithubLogo />}
+                       onClick={() =>
+                         window.open(
+                           'https://github.com/QuantumNous/new-api',
+@@ -242,7 +253,7 @@ const Home = () => {
+                     docsLink && (
+                       <Button
+                         size={isMobile ? 'default' : 'large'}
+-                        className='flex items-center !rounded-3xl px-6 py-2'
++                        className='fglab-secondary-action flex items-center !rounded-3xl px-6 py-2'
+                         icon={<IconFile />}
+                         onClick={() => window.open(docsLink, '_blank')}
+                       >
+@@ -254,15 +265,22 @@ const Home = () => {
+ 
+                 {/* 框架兼容性图标 */}
+                 <div className='mt-12 md:mt-16 lg:mt-20 w-full'>
++                  <div className='fglab-inventor-avatars'>
++                    {labAvatars.map((avatar) => (
++                      <div key={avatar.alt} className='fglab-inventor-avatar'>
++                        <img src={avatar.src} alt={avatar.alt} />
++                      </div>
++                    ))}
++                  </div>
+                   <div className='flex items-center mb-6 md:mb-8 justify-center'>
+                     <Text
+                       type='tertiary'
+-                      className='text-lg md:text-xl lg:text-2xl font-light'
+-                    >
+-                      {t('支持众多的大模型供应商')}
++                        className='fglab-provider-title text-lg md:text-xl lg:text-2xl font-light'
++                      >
++                        {t('支持众多的大模型供应商')}
+                     </Text>
+                   </div>
+-                  <div className='flex flex-wrap items-center justify-center gap-3 sm:gap-4 md:gap-6 lg:gap-8 max-w-5xl mx-auto px-4'>
++                  <div className='flex flex-wrap items-center justify-center gap-3 sm:gap-4 md:gap-5 lg:gap-6 max-w-6xl mx-auto px-4'>
+                     <div className='w-8 h-8 sm:w-10 sm:h-10 md:w-12 md:h-12 flex items-center justify-center'>
+                       <Moonshot size={40} />
+                     </div>
