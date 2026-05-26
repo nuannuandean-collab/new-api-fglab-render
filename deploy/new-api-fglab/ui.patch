@@ -20,13 +20,14 @@ index 3361b8c..e709f00 100644
  	})
  	server.Use(sessions.Sessions("session", store))
 diff --git a/middleware/cors.go b/middleware/cors.go
-index 6aaa15d..bfa2040 100644
+index 6aaa15d..2ce3f0f 100644
 --- a/middleware/cors.go
 +++ b/middleware/cors.go
-@@ -1,20 +1,61 @@
+@@ -1,20 +1,92 @@
  package middleware
  
  import (
++	"net/url"
 +	"os"
 +	"strings"
 +
@@ -40,12 +41,8 @@ index 6aaa15d..bfa2040 100644
  	config := cors.DefaultConfig()
 -	config.AllowAllOrigins = true
 +	origins := configuredCorsOrigins()
-+	if len(origins) > 0 {
-+		config.AllowOrigins = origins
-+	} else {
-+		config.AllowOriginFunc = func(origin string) bool {
-+			return false
-+		}
++	config.AllowOriginFunc = func(origin string) bool {
++		return isAllowedCorsOrigin(origin, origins)
 +	}
  	config.AllowCredentials = true
  	config.AllowMethods = []string{"GET", "POST", "PUT", "DELETE", "OPTIONS"}
@@ -82,6 +79,40 @@ index 6aaa15d..bfa2040 100644
 +		origins = append(origins, origin)
 +	}
 +	return origins
++}
++
++func isAllowedCorsOrigin(origin string, configuredOrigins []string) bool {
++	origin = strings.TrimRight(strings.TrimSpace(origin), "/")
++	if origin == "" {
++		return false
++	}
++	for _, allowedOrigin := range configuredOrigins {
++		if origin == allowedOrigin {
++			return true
++		}
++	}
++	return isTrustedDesktopClientOrigin(origin)
++}
++
++func isTrustedDesktopClientOrigin(origin string) bool {
++	if origin == "null" || origin == "file://" {
++		return true
++	}
++
++	parsed, err := url.Parse(origin)
++	if err != nil {
++		return false
++	}
++
++	switch parsed.Scheme {
++	case "http", "https":
++		host := parsed.Hostname()
++		return host == "localhost" || host == "127.0.0.1" || host == "::1"
++	case "tauri", "app", "opencode":
++		return parsed.Hostname() == "localhost"
++	default:
++		return false
++	}
 +}
 +
  func PoweredBy() gin.HandlerFunc {
